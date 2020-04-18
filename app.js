@@ -11,10 +11,6 @@ client.on("message", (channel, tags, message, self) => {
 	if (message.toLowerCase() === "!hello") {
 		client.say(channel, `@${tags.username}, heya!`);
 	}
-
-	if (message.toLowerCase() === "!help") {
-		client.whisper(tags.username, "Here are the commands you can use:\n[!hello] I will greet you right back.");
-	}
 });
 
 setInterval(() => {
