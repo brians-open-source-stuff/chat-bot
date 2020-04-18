@@ -1,20 +1,8 @@
 require("dotenv").config();
 const tmi = require("tmi.js");
+const options = require("./options");
 
-const client = new tmi.Client({
-	options: {
-		debug: true
-	},
-	connection: {
-		reconnect: true,
-		secure: true
-	},
-	identity: {
-		username: process.env.BOT_USERNAME,
-		password: process.env.BOT_KEY
-	},
-	channels: ["brianemilius"]
-});
+const client = new tmi.Client(options);
 
 client.connect().then(() => client.color("SeaGreen")).catch(() => process.exit(1));
 client.on("message", (channel, tags, message, self) => {
