@@ -1,0 +1,33 @@
+@import url('https://fonts.googleapis.com/css?family=Bangers&display=swap');
+
+body {
+	background-color:grey;
+}
+
+p {
+	margin: 0;
+}
+
+.singleMessage {
+	display: grid;
+	font-family: Bangers;
+  min-height: 3em;
+  width: 600px;
+  border: solid black;
+  border-color: black;
+  border-width: 3px 4px 3px 5px;
+  border-radius: 100% 4% 76% 5%/4% 95% 6% 95%;
+  box-sizing: border-box;
+	padding: .8em 1.3em;
+	background-color: white;
+}
+
+.username {
+	letter-spacing: .2em;
+	color: red;
+	font-size: 110%;
+}
+
+.message {
+	font-size: 160%;
+}

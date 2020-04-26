@@ -1,25 +1,36 @@
 require("dotenv").config();
 const tmi = require("tmi.js");
 const { get } = require("axios");
+const express = require("express");
+const app = express();
+const server = require("http").createServer(app);
+const io = require("socket.io")(server);
 const options = require("./options");
 
-const client = new tmi.Client(options);
+const tmiClient = new tmi.Client(options);
+
+app.use(express.static("public"));
+
+server.listen(4444);
+io.on("connection", ioClient => handleSocketConnection(ioClient));
 
 let timeout;
 
-let chatters = []
+let chatters = [];
 
-client.connect()
-	.then(() => client.color("SeaGreen"))
+tmiClient.connect()
+	.then(() => tmiClient.color("SeaGreen"))
 	.catch(() => process.exit(1));
 
-client.on("message", (channel, tags, message, self) => {
+tmiClient.on("message", (channel, tags, message, self) => {
 	if (self) return;
 
 	chatterCheck(channel, tags);
 
+	io.emit("message", { user: tags.username, message });
+
 	if (message.toLowerCase() === "!hello") {
-		client.say(channel, `@${tags.username}, heya!`);
+		tmiClient.say(channel, `@${tags.username}, heya!`);
 	}
 
 	if (message.toLowerCase() === "!joke") {
@@ -30,7 +41,7 @@ client.on("message", (channel, tags, message, self) => {
 		})
 			.then(response => {
 				if (!timeout || (timeout + (5 * 60 * 1000)) < Date.now()) {
-					client.say(channel, response.data.joke);
+					tmiClient.say(channel, response.data.joke);
 					timeout = Date.now();
 				}
 			});
@@ -38,7 +49,7 @@ client.on("message", (channel, tags, message, self) => {
 });
 
 setInterval(() => {
-	client.say("#brianemilius", "Hey! If you like this stream please say \"Hi!\" in chat and give Brian a follow. Say !help for commands. You can also follow Brian on Twitter: twitter.com/BrianEmilius");
+	tmiClient.say("#brianemilius", "Hey! If you like this stream please say \"Hi!\" in chat and give Brian a follow. Say !help for commands. You can also follow Brian on Twitter: twitter.com/BrianEmilius");
 }, 10 * 60 * 1000);
 
 function chatterCheck(channel, tags) {
@@ -51,9 +62,13 @@ function chatterCheck(channel, tags) {
 		});
 	} else {
 		let index = chatters.findIndex(user => user.id === tags["user-id"]);
-		
+		// TODO: Spam filter
 		//chatters[index].timestamps.push(parseInt(tags["tmi-sent-ts"]));
 	}
 
 	console.log(chatters);
+}
+
+function handleSocketConnection(ioClient) {
+	console.log("A user joined!");
 }
